@@ -1,0 +1,14 @@
+{
+  "name": "hiragino-latex",
+  "version": "1.0.0",
+  "description": "hiragino-latex",
+  "scripts": {
+    "lint": "prh document.tex --diff",
+    "lint:fix": "prh document.tex --replace"
+  },
+  "author": "shamofu",
+  "license": "MIT",
+  "devDependencies": {
+    "prh": "^5.4.3"
+  }
+}

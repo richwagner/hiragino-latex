@@ -1,0 +1,8 @@
+# prh version
+version: 1
+
+rules:
+  - expected: ，
+    pattern: 、
+  - expected: ．
+    pattern: 。

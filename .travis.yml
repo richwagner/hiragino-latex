@@ -1,0 +1,38 @@
+language: node_js
+node_js: lts/*
+os: osx
+osx_image: xcode10.1
+before_install:
+  - brew update
+install:
+  - brew install ghostscript lcdf-typetools poppler
+  - brew cask install basictex
+  - export PATH="/Library/TeX/texbin:$PATH"
+  - sudo tlmgr update --self --all
+  - sudo tlmgr install scheme-full
+  - curl -fsSL https://www.preining.info/rsa.asc | sudo tlmgr key add -
+  - sudo tlmgr repository add http://contrib.texlive.info/current tlcontrib
+  - sudo tlmgr pinning add tlcontrib '*'
+  - sudo tlmgr install japanese-otf-nonfree japanese-otf-uptex-nonfree ptex-fontmaps-macos cjk-gs-integrate-macos
+  - yarn install
+before_script:
+  - sudo cjk-gs-integrate --link-texmf --cleanup --force
+  - sudo cjk-gs-integrate-macos --link-texmf --force
+  - sudo mktexlsr
+  - sudo kanji-config-updmap-sys --jis2004 hiragino-highsierra-pron
+  - sudo kanji-config-updmap-sys status
+script:
+  - yarn lint --verify
+  - latexmk -pdfdvi -norc -e "\$dvipdf='dvipdfmx %O -o %D %S'; \$makeindex='upmendex %O -o %D %S'; \$biber='biber %O --bblencoding=utf8 -u -U --output_safechars %B'; \$bibtex='upbibtex %O %B'; \$latex='uplatex %O -kanji=utf8 -interaction=nonstopmode -file-line-error %S';"
+    document.tex
+  - pdffonts document.pdf
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: BYQEI2fzS0bhEbQl8FRLrZdIiMbBslscx+qkQE7i30ROqP/99kkBb/r40yo6Q0UDu17Xjz2Tud3qBpFtaFKeHyBUq1+zYwWPTCkQTkc7by15Uxpw5VBEkWNhfepTgug2mUGiQUAumHMBLbDymoScWcKMvm6DbGt1nixepI4NpToL1mJOleUbyCFvyOOBsdeYq1DqcZgVl+1IPvynj0T1FAHO65bFDGVhHh8c+6tonGjAGV8R6FsFFltm0OT2Ld6A5duHK67Nzsq1nUAcIYc/oq7KHQ+KFPlCKSwGV8QuuXePC82wExuyKBHfgKfoemwNzZ4U1LsT3+W81MKrOIzNCp+J6stAxZfISStEH9HTP4wmuRvS5cMq1UxntdPFr5b9By60g+L2+p5qPMoKfHmseBwdPbRl3xDzXIcQvwjkxoz88gMyiP1IlfWIuTKscFFzO8WA9RAne9PGl1aS4YnYRj1ges+4BIIzbvRGsqNYNaZlnVG13ct+HBH/dQqaVf/LJirOtPjqVy42oDuFtfTu7EZQmHTDfM57YacuoSZOVtv7oexDV4uOUBf3ogF9cVyQvT30KlZ4b6faARjSTWEkyCQtlDfNouIrqDdOwzgAatmEhlpgw42vbTkClM2RlL/ItbQntXIlXAXsou7GUDAH+ynCTTIddt+PKnNBZPUJPIw=
+  file:
+    - document.pdf
+  on:
+    branch: master
+    tags: true
