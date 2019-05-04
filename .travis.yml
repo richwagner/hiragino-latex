@@ -1,11 +1,11 @@
 language: node_js
 node_js: lts/*
 os: osx
-osx_image: xcode10.1
+osx_image: xcode10.2
 before_install:
   - brew update
 install:
-  - brew install ghostscript lcdf-typetools poppler
+  - brew install ghostscript lcdf-typetools
   - brew cask install basictex
   - export PATH="/Library/TeX/texbin:$PATH"
   - sudo tlmgr update --self --all
